@@ -3,6 +3,7 @@ kind: ObjectType
 version: v1
 definition:
   name: Orders
+# the structure of the Orders object type, including the names and data types of its fields
   fields:
     - name: createdAt
       type: Timestamptz!
@@ -20,7 +21,9 @@ definition:
       type: Timestamptz!
     - name: userId
       type: Uuid!
-  graphql:
+
+# represented in the GraphQL schema
+  graphql:   
     typeName: MySubgraph_Orders
     inputTypeName: MySubgraph_OrdersInput
   dataConnectorTypeMapping:
@@ -52,6 +55,7 @@ definition:
           column:
             name: user_id
 
+# This configuration specifies the permissions for different user roles, controlling which fields they are allowed to access within the Orders type
 ---
 kind: TypePermissions
 version: v1
@@ -69,7 +73,17 @@ definition:
           - status
           - updatedAt
           - userId
-
+    - role: user
+      output:
+        allowedFields:
+          - id
+          - isReviewed
+          - productId
+          - status
+          - updatedAt
+          - userId
+# This configuration is used to create a boolean expression type that allows filtering operations on the Orders object type
+# enableAll: true -> This means all standard filtering operators (e.g., _eq for equality, _neq for inequality, _gt for greater than, etc.) are enabled for this field
 ---
 kind: ObjectBooleanExpressionType
 version: v1
@@ -106,6 +120,7 @@ definition:
   graphql:
     typeName: MySubgraph_OrdersBoolExp
 
+# This model represents the Orders data entity, specifying how it should be queried, filtered, and ordered in the GraphQL schema
 ---
 kind: Model
 version: v1
@@ -159,7 +174,14 @@ definition:
     - role: admin
       select:
         filter: null
-
+    - role: user
+      select:
+        filter:
+          fieldComparison:
+            field: id
+            operator: _eq
+            value:
+              sessionVariable: x-hasura-user-id
 ---
 kind: Relationship
 version: v1
