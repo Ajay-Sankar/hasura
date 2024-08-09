@@ -1,0 +1,8 @@
+kind: Connector
+version: v1
+definition:
+  name: my_pg
+  subgraph: my_subgraph
+  source: hasura/postgres:v1.0.1
+  context: .
+  envFile: .env.cloud
