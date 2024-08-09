@@ -1,0 +1,101 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: Manufacturers
+  fields:
+    - name: id
+      type: Uuid!
+    - name: name
+      type: Text!
+  graphql:
+    typeName: MySubgraph_Manufacturers
+    inputTypeName: MySubgraph_ManufacturersInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: my_pg
+      dataConnectorObjectType: manufacturers
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: Manufacturers
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - id
+          - name
+
+---
+kind: ObjectBooleanExpressionType
+version: v1
+definition:
+  name: ManufacturersBoolExp
+  objectType: Manufacturers
+  dataConnectorName: my_pg
+  dataConnectorObjectType: manufacturers
+  comparableFields:
+    - fieldName: id
+      operators:
+        enableAll: true
+    - fieldName: name
+      operators:
+        enableAll: true
+  graphql:
+    typeName: MySubgraph_ManufacturersBoolExp
+
+---
+kind: Model
+version: v1
+definition:
+  name: Manufacturers
+  objectType: Manufacturers
+  source:
+    dataConnectorName: my_pg
+    collection: manufacturers
+  filterExpressionType: ManufacturersBoolExp
+  orderableFields:
+    - fieldName: id
+      orderByDirections:
+        enableAll: true
+    - fieldName: name
+      orderByDirections:
+        enableAll: true
+  graphql:
+    selectMany:
+      queryRootField: mySubgraph_manufacturers
+    selectUniques:
+      - queryRootField: mySubgraph_manufacturersById
+        uniqueIdentifier:
+          - id
+    orderByExpressionType: MySubgraph_ManufacturersOrderBy
+
+---
+kind: ModelPermissions
+version: v1
+definition:
+  modelName: Manufacturers
+  permissions:
+    - role: admin
+      select:
+        filter: null
+
+---
+kind: Relationship
+version: v1
+definition:
+  name: products
+  sourceType: Manufacturers
+  target:
+    model:
+      name: Products
+      relationshipType: Array
+  mapping:
+    - source:
+        fieldPath:
+          - fieldName: id
+      target:
+        modelField:
+          - fieldName: manufacturerId
+
