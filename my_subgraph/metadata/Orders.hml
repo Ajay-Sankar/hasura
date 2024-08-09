@@ -196,3 +196,22 @@ definition:
         modelField:
           - fieldName: id
 
+---
+kind: Relationship
+version: v1
+definition:
+  name: User
+  sourceType: Orders
+  target:
+    model:
+      name: Users
+      subgraph: my_subgraph
+      relationshipType: Object
+  mapping:
+    - source:
+        fieldPath:
+          - fieldName: userId
+      target:
+        modelField:
+          - fieldName: id
+  description: The customer details for an order
